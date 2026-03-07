@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
+import { useNavigate } from "react-router";
 import { Field, BandwidthState } from "./field";
+import { Home } from "lucide-react";
 
 export function WearableWidget() {
   const [bandwidth, setBandwidth] = useState(52);
+  const navigate = useNavigate();
 
   const getBandwidthState = (value: number): BandwidthState => {
     if (value < 40) return "optimal";
@@ -57,6 +60,15 @@ export function WearableWidget() {
       className="relative bg-black overflow-hidden flex flex-col items-center justify-center"
       style={{ width: "198px", height: "242px" }}
     >
+      {/* Back to Home */}
+      <button
+        onClick={() => navigate("/home")}
+        className="absolute top-2 right-2 z-10 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+        aria-label="Back to home"
+      >
+        <Home className="w-4 h-4" />
+      </button>
+
       {/* Field Thumbnail */}
       <div className="relative" style={{ width: "140px", height: "140px" }}>
         <Field

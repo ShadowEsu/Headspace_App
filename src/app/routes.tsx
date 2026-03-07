@@ -7,6 +7,7 @@ import { GroupMode } from "./components/group-mode";
 import { Interventions } from "./components/interventions";
 import { Safeguards } from "./components/safeguards";
 import { WearableWidget } from "./components/wearable-widget";
+import { EnvironmentRadar } from "./components/environment-radar";
 
 export const router = createBrowserRouter([
   {
@@ -40,5 +41,9 @@ export const router = createBrowserRouter([
   {
     path: "/widget",
     Component: WearableWidget,
+  },
+  {
+    path: "/environment-radar",
+    Component: EnvironmentRadar,
   },
 ]);

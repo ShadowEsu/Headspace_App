@@ -232,3 +232,53 @@
     line-height: 1.5;
   }
 }
+
+/* Fun facts ticker */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.fun-facts-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+/* Hackathon-grade UI polish */
+@keyframes radar-sweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-6px) scale(1.02); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; filter: blur(24px); }
+  50% { opacity: 0.7; filter: blur(32px); }
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.gradient-mesh {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45, 212, 191, 0.15), transparent),
+              radial-gradient(ellipse 60% 40% at 100% 50%, rgba(251, 191, 36, 0.08), transparent),
+              radial-gradient(ellipse 50% 30% at 0% 80%, rgba(45, 212, 191, 0.1), transparent);
+}
+
+.card-glow {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04), 0 4px 24px -4px rgba(0, 0, 0, 0.08), 0 0 40px -8px rgba(45, 212, 191, 0.12);
+}
+
+.card-glow-hover:hover {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 32px -8px rgba(0, 0, 0, 0.12), 0 0 48px -12px rgba(45, 212, 191, 0.18);
+}
+
+.blob-glow {
+  animation: glow-pulse 3s ease-in-out infinite;
+}

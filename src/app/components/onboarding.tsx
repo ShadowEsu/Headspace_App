@@ -43,12 +43,17 @@ export function Onboarding() {
     <div className="relative h-screen w-screen bg-white overflow-hidden flex flex-col">
       {/* Progress */}
       <div className="absolute top-0 left-0 right-0 p-6 z-10">
-        <Progress value={((step + 1) / 4) * 100} className="h-1" />
-        <p className="text-xs text-gray-500 mt-2">Step {step + 1} of 3</p>
+        <Progress
+          value={((step === 2 && archetype ? 4 : step + 1) / 4) * 100}
+          className="h-1"
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          Step {step === 2 && archetype ? 4 : step + 1} of 4
+        </p>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex items-center justify-center px-6">
+      {/* Content - scrollable so button is never clipped */}
+      <div className="flex-1 flex items-center justify-center px-6 min-h-0 overflow-y-auto">
         <AnimatePresence mode="wait">
           {step === 0 && (
             <motion.div
@@ -57,19 +62,21 @@ export function Onboarding() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="text-center max-w-sm"
+              className="text-center max-w-sm w-full py-6"
             >
               <h1 className="text-2xl mb-4">Welcome to Headspace</h1>
               <p className="text-gray-600 mb-8">
                 We'll establish your cognitive baseline through a brief calibration. This takes
                 approximately 90 seconds.
               </p>
-              <div className="mb-8">
+              <div className="mb-8 pointer-events-none">
                 <Field bandwidth={35} state="optimal" className="h-64" />
               </div>
-              <Button onClick={handleNext} className="w-full">
-                Begin Calibration
-              </Button>
+              <div className="relative z-10">
+                <Button type="button" onClick={handleNext} className="w-full cursor-pointer">
+                  Begin Calibration
+                </Button>
+              </div>
             </motion.div>
           )}
 
@@ -108,11 +115,12 @@ export function Onboarding() {
                 ))}
               </div>
               <Button
+                type="button"
                 onClick={() => {
                   setPermissionsGranted(true);
                   handleNext();
                 }}
-                className="w-full"
+                className="w-full cursor-pointer"
               >
                 Grant Permissions
               </Button>
@@ -132,8 +140,10 @@ export function Onboarding() {
               <p className="text-gray-600 mb-8 text-sm">
                 Analyzing your baseline cognitive signature
               </p>
-              <Field bandwidth={50} state="moderate" className="h-64" />
-              <Button onClick={handleNext} className="w-full mt-8">
+              <div className="pointer-events-none">
+                <Field bandwidth={50} state="moderate" className="h-64" />
+              </div>
+              <Button type="button" onClick={handleNext} className="w-full mt-8 relative z-10 cursor-pointer">
                 Complete Calibration
               </Button>
             </motion.div>
@@ -153,10 +163,10 @@ export function Onboarding() {
               </div>
               <h2 className="text-2xl mb-3">{archetype}</h2>
               <p className="text-gray-600 text-sm mb-8">{getArchetypeDescription(archetype)}</p>
-              <div className="mb-8">
+              <div className="mb-8 pointer-events-none">
                 <Field bandwidth={20} state="optimal" className="h-48" />
               </div>
-              <Button onClick={handleNext} className="w-full">
+              <Button type="button" onClick={handleNext} className="w-full relative z-10 cursor-pointer">
                 Continue to Home
               </Button>
             </motion.div>
