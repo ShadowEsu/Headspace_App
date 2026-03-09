@@ -71,6 +71,15 @@ const interventions: Intervention[] = [
   },
 ];
 
+const CATEGORY_COLORS: Record<string, string> = {
+  Breathwork: "bg-teal-100 text-teal-700",
+  "Task Management": "bg-amber-100 text-amber-700",
+  Environment: "bg-emerald-100 text-emerald-700",
+  Rest: "bg-rose-100 text-rose-700",
+  Audio: "bg-violet-100 text-violet-700",
+  Visual: "bg-sky-100 text-sky-700",
+};
+
 export function Interventions() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -84,36 +93,42 @@ export function Interventions() {
   const getStateColor = (state: BandwidthState) => {
     switch (state) {
       case "optimal":
-        return "#2DD4BF";
+        return { bg: "#0D948815", color: "#0D9488" };
       case "moderate":
-        return "#FBBF24";
+        return { bg: "#F59E0B15", color: "#F59E0B" };
       case "strained":
-        return "#FB923C";
+        return { bg: "#F9731615", color: "#F97316" };
       case "critical":
-        return "#EF4444";
+        return { bg: "#E11D4815", color: "#E11D48" };
     }
   };
 
   return (
-    <div className="relative h-screen w-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen w-full bg-[#FAFAF9] overflow-hidden">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 bg-white border-b border-gray-100">
-        <div className="flex items-center justify-between p-6">
-          <button onClick={() => navigate("/home")}>
-            <ArrowLeft className="w-6 h-6 text-gray-700" />
-          </button>
-          <h2 className="text-sm uppercase tracking-wider">Interventions</h2>
-          <div className="w-6" />
+      <header className="sticky top-0 z-20 glass-panel border-b border-black/5">
+        <div className="flex items-center justify-between px-4 py-4">
+          <motion.button
+            whileTap={{ scale: 0.96 }}
+            onClick={() => navigate("/home")}
+            className="p-2 -ml-2 rounded-full hover:bg-black/5"
+          >
+            <ArrowLeft className="w-5 h-5 text-stone-700" />
+          </motion.button>
+          <h2 className="text-sm font-semibold text-stone-800 uppercase tracking-wider">
+            Interventions
+          </h2>
+          <div className="w-9" />
         </div>
 
-        {/* Category Pills */}
-        <div className="px-6 pb-4 flex gap-2 overflow-x-auto">
+        {/* Filter chips */}
+        <div className="px-4 pb-4 flex gap-2 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => setSelectedCategory(null)}
-            className={`px-4 py-2 rounded-full text-xs whitespace-nowrap transition-colors ${
+            className={`px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === null
-                ? "bg-gray-900 text-white"
-                : "bg-gray-100 text-gray-700"
+                ? "bg-[#0D9488] text-white"
+                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
             }`}
           >
             All
@@ -122,61 +137,68 @@ export function Interventions() {
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-xs whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-700"
+                  ? "bg-[#0D9488] text-white"
+                  : "bg-stone-100 text-stone-600 hover:bg-stone-200"
               }`}
             >
               {cat}
             </button>
           ))}
         </div>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="absolute top-36 left-0 right-0 bottom-0 overflow-y-auto px-6 pb-6">
-        <div className="space-y-3">
+      <div className="overflow-y-auto px-4 py-6 pb-24">
+        <div className="space-y-4 max-w-2xl mx-auto">
           {filteredInterventions.map((intervention, i) => {
             const Icon = intervention.icon;
+            const catColor = CATEGORY_COLORS[intervention.category] ?? "bg-stone-100 text-stone-700";
             return (
               <motion.div
                 key={intervention.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white border border-gray-200 rounded-2xl p-4 hover:shadow-lg transition-shadow"
+                className="bento-card p-5 hover:shadow-md"
               >
                 <div className="flex items-start gap-4">
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-6 h-6 text-gray-700" />
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${catColor}`}
+                  >
+                    <Icon className="w-6 h-6" />
                   </div>
 
-                  {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="font-medium">{intervention.title}</h3>
-                      <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-semibold text-stone-900">{intervention.title}</h3>
+                      <span className="text-xs text-stone-500 whitespace-nowrap">
                         {intervention.duration}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{intervention.description}</p>
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-lg text-[10px] font-medium mb-2 ${catColor}`}
+                    >
+                      {intervention.category}
+                    </span>
+                    <p className="text-sm text-stone-600 mb-3 leading-relaxed">
+                      {intervention.description}
+                    </p>
 
-                    {/* Trigger States */}
                     <div className="flex flex-wrap gap-1.5">
-                      {intervention.triggerStates.map((state) => (
-                        <div
-                          key={state}
-                          className="px-2 py-1 rounded text-xs capitalize"
-                          style={{
-                            backgroundColor: `${getStateColor(state)}15`,
-                            color: getStateColor(state),
-                          }}
-                        >
-                          {state}
-                        </div>
-                      ))}
+                      {intervention.triggerStates.map((state) => {
+                        const { bg, color } = getStateColor(state);
+                        return (
+                          <span
+                            key={state}
+                            className="px-2.5 py-1 rounded-lg text-xs font-medium capitalize"
+                            style={{ backgroundColor: bg, color }}
+                          >
+                            {state}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -185,11 +207,10 @@ export function Interventions() {
           })}
         </div>
 
-        {/* Info */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-2xl">
-          <p className="text-xs text-gray-600 leading-relaxed">
-            Interventions are context-aware and triggered based on your current bandwidth state.
-            Each has been validated for cognitive load reduction in controlled studies.
+        <div className="mt-8 p-5 rounded-2xl bg-stone-50/80 border border-stone-100 max-w-2xl mx-auto">
+          <p className="text-sm text-stone-600 leading-relaxed">
+            Interventions are context-aware and triggered based on your current bandwidth state. Each
+            has been validated for cognitive load reduction in controlled studies.
           </p>
         </div>
       </div>

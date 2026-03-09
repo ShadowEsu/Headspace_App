@@ -1,203 +1,175 @@
-import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, Download, Share2 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { ArrowLeft, Download } from "lucide-react";
+
+const MOCK_WEEKLY_DATA = [
+  { day: "Mon", avg: 42, peak: 68 },
+  { day: "Tue", avg: 55, peak: 72 },
+  { day: "Wed", avg: 61, peak: 85 },
+  { day: "Thu", avg: 48, peak: 71 },
+  { day: "Fri", avg: 72, peak: 91 },
+  { day: "Sat", avg: 38, peak: 54 },
+  { day: "Sun", avg: 45, peak: 62 },
+];
 
 export function WeeklyReport() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const navigate = useNavigate();
-  const [isGenerated, setIsGenerated] = useState(false);
 
-  // Generate unique abstract shape from mock weekly data
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Set canvas size
-    const dpr = window.devicePixelRatio || 1;
-    canvas.width = 300 * dpr;
-    canvas.height = 300 * dpr;
-    canvas.style.width = "300px";
-    canvas.style.height = "300px";
-    ctx.scale(dpr, dpr);
-
-    // Clear canvas
-    ctx.clearRect(0, 0, 300, 300);
-
-    // Mock weekly bandwidth data (7 days, multiple readings per day)
-    const weekData = Array.from({ length: 7 }, () =>
-      Array.from({ length: 12 }, () => Math.random() * 100)
-    );
-
-    // Generate organic shape based on data
-    const centerX = 150;
-    const centerY = 150;
-    const points = 24;
-
-    ctx.beginPath();
-
-    // Create gradient based on average bandwidth
-    const avgBandwidth = weekData.flat().reduce((a, b) => a + b, 0) / weekData.flat().length;
-    const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 120);
-
-    if (avgBandwidth < 40) {
-      gradient.addColorStop(0, "#2DD4BF");
-      gradient.addColorStop(1, "#0D9488");
-    } else if (avgBandwidth < 60) {
-      gradient.addColorStop(0, "#FBBF24");
-      gradient.addColorStop(1, "#D97706");
-    } else if (avgBandwidth < 80) {
-      gradient.addColorStop(0, "#FB923C");
-      gradient.addColorStop(1, "#EA580C");
-    } else {
-      gradient.addColorStop(0, "#EF4444");
-      gradient.addColorStop(1, "#B91C1C");
-    }
-
-    // Draw organic blob
-    for (let i = 0; i <= points; i++) {
-      const angle = (i / points) * Math.PI * 2;
-      const dataIndex = Math.floor((i / points) * weekData.flat().length);
-      const dataValue = weekData.flat()[dataIndex] || 50;
-      const radius = 50 + (dataValue / 100) * 70;
-
-      const x = centerX + Math.cos(angle) * radius;
-      const y = centerY + Math.sin(angle) * radius;
-
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        // Use quadratic curves for smooth organic shape
-        const prevAngle = ((i - 1) / points) * Math.PI * 2;
-        const prevDataValue = weekData.flat()[Math.floor(((i - 1) / points) * weekData.flat().length)] || 50;
-        const prevRadius = 50 + (prevDataValue / 100) * 70;
-        const prevX = centerX + Math.cos(prevAngle) * prevRadius;
-        const prevY = centerY + Math.sin(prevAngle) * prevRadius;
-
-        const cpX = (prevX + x) / 2;
-        const cpY = (prevY + y) / 2;
-
-        ctx.quadraticCurveTo(prevX, prevY, cpX, cpY);
-      }
-    }
-
-    ctx.closePath();
-    ctx.fillStyle = gradient;
-    ctx.fill();
-
-    // Add subtle noise texture
-    ctx.globalAlpha = 0.1;
-    for (let i = 0; i < 2000; i++) {
-      const x = Math.random() * 300;
-      const y = Math.random() * 300;
-      ctx.fillStyle = Math.random() > 0.5 ? "#000" : "#fff";
-      ctx.fillRect(x, y, 1, 1);
-    }
-
-    setIsGenerated(true);
-  }, []);
-
-  const handleShare = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `headspace-weekly-${new Date().toISOString().split("T")[0]}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  };
-
-  // Mock stats
   const stats = {
     avgBandwidth: 58,
-    peakLoad: 87,
+    peakLoad: 91,
     optimalHours: 42,
     interventionsUsed: 12,
   };
 
+  const handleDownload = () => {
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          { week: "Feb 27 - Mar 6, 2026", data: MOCK_WEEKLY_DATA, stats },
+          null,
+          2
+        ),
+      ],
+      { type: "application/json" }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bandwidth-weekly-${new Date().toISOString().split("T")[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="relative h-screen w-screen bg-white overflow-hidden">
+    <div className="relative min-h-screen w-full bg-[#FAFAF9] overflow-hidden">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-6">
-        <button onClick={() => navigate("/home")}>
-          <ArrowLeft className="w-6 h-6 text-gray-700" />
+      <header className="sticky top-0 z-20 flex items-center justify-between px-4 py-4 glass-panel border-b border-black/5">
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={() => navigate("/home")}
+          className="p-2 -ml-2 rounded-full hover:bg-black/5"
+        >
+          <ArrowLeft className="w-5 h-5 text-stone-700" />
+        </motion.button>
+        <h2 className="text-sm font-semibold text-stone-800 uppercase tracking-wider">
+          Weekly report
+        </h2>
+        <button
+          onClick={handleDownload}
+          className="p-2 -mr-2 rounded-full hover:bg-black/5"
+          aria-label="Download"
+        >
+          <Download className="w-5 h-5 text-stone-700" />
         </button>
-        <h2 className="text-sm uppercase tracking-wider">Weekly Report</h2>
-        <button onClick={handleShare}>
-          <Share2 className="w-5 h-5 text-gray-700" />
-        </button>
-      </div>
+      </header>
 
       {/* Content */}
-      <div className="h-full flex flex-col items-center justify-center px-6 pb-20">
+      <div className="overflow-y-auto px-4 py-6 pb-24">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1 }}
-          className="text-center mb-6"
+          transition={{ duration: 0.4 }}
+          className="max-w-2xl mx-auto"
         >
-          <div className="text-xs text-gray-500 mb-1">Feb 27 - Mar 6, 2026</div>
-          <h1 className="text-2xl">Your Cognitive Portrait</h1>
-        </motion.div>
+          <p className="text-xs text-stone-500 mb-1">Feb 27 – Mar 6, 2026</p>
+          <h1 className="text-2xl font-bold text-stone-900 mb-6">Cognitive bandwidth</h1>
 
-        {/* Generated Data Portrait */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: isGenerated ? 1 : 0, scale: isGenerated ? 1 : 0.9 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mb-8"
-        >
-          <canvas
-            ref={canvasRef}
-            className="rounded-3xl shadow-2xl"
-            style={{ width: 300, height: 300 }}
-          />
-        </motion.div>
+          {/* Chart */}
+          <div className="bento-card p-5 mb-6">
+            <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-4">
+              Daily average load
+            </p>
+            <div className="h-56 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={MOCK_WEEKLY_DATA} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="bandwidthGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#0D9488" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#0D9488" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#E7E5E4" vertical={false} />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 12, fill: "#78716C" }}
+                    axisLine={{ stroke: "#E7E5E4" }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fontSize: 12, fill: "#78716C" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => `${v}%`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #E7E5E4",
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                    }}
+                    formatter={(value: number) => [`${value}%`, "Load"]}
+                    labelFormatter={(label) => label}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="avg"
+                    stroke="#0D9488"
+                    strokeWidth={2}
+                    fill="url(#bandwidthGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
 
-        {/* Stats Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-          className="grid grid-cols-2 gap-4 w-full max-w-sm"
-        >
-          <div className="bg-gray-50 rounded-2xl p-4 text-center">
-            <div className="text-2xl mb-1">{stats.avgBandwidth}%</div>
-            <div className="text-xs text-gray-600">Avg Bandwidth</div>
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "Avg. bandwidth", value: `${stats.avgBandwidth}%`, color: "text-[#0D9488]" },
+              { label: "Peak load", value: `${stats.peakLoad}%`, color: "text-[#F97316]" },
+              { label: "Optimal hours", value: `${stats.optimalHours}h`, color: "text-stone-900" },
+              {
+                label: "Interventions used",
+                value: stats.interventionsUsed,
+                color: "text-stone-900",
+              },
+            ].map((s) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bento-card p-5 text-center"
+              >
+                <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-xs text-stone-500 mt-1">{s.label}</p>
+              </motion.div>
+            ))}
           </div>
-          <div className="bg-gray-50 rounded-2xl p-4 text-center">
-            <div className="text-2xl mb-1">{stats.peakLoad}%</div>
-            <div className="text-xs text-gray-600">Peak Load</div>
-          </div>
-          <div className="bg-gray-50 rounded-2xl p-4 text-center">
-            <div className="text-2xl mb-1">{stats.optimalHours}h</div>
-            <div className="text-xs text-gray-600">Optimal Hours</div>
-          </div>
-          <div className="bg-gray-50 rounded-2xl p-4 text-center">
-            <div className="text-2xl mb-1">{stats.interventionsUsed}</div>
-            <div className="text-xs text-gray-600">Interventions</div>
-          </div>
-        </motion.div>
 
-        {/* Download Button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-          onClick={handleShare}
-          className="mt-8 px-6 py-3 bg-gray-900 text-white rounded-full text-sm flex items-center gap-2"
-        >
-          <Download className="w-4 h-4" />
-          Download Portrait
-        </motion.button>
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            onClick={handleDownload}
+            className="mt-8 w-full py-3 rounded-xl bg-[#0D9488] text-white font-medium text-sm flex items-center justify-center gap-2 hover:bg-[#0B8075]"
+          >
+            <Download className="w-4 h-4" />
+            Export report
+          </motion.button>
+        </motion.div>
       </div>
     </div>
   );

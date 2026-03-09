@@ -2,14 +2,16 @@
 
 :root {
   --font-size: 16px;
-  --background: #ffffff;
-  --foreground: oklch(0.145 0 0);
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --background: #FAFAF9;
+  --foreground: #1C1917;
   --card: #ffffff;
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: #1C1917;
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #030213;
-  --primary-foreground: oklch(1 0 0);
+  --primary: #0D9488;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.95 0.0058 264.53);
   --secondary-foreground: #030213;
   --muted: #ececf0;
@@ -30,7 +32,8 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
+  --radius: 0.75rem;
+  --radius-bento: 1rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: #030213;
@@ -40,40 +43,40 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Bandwidth State Tokens */
-  /* Optimal State - Cool blue-greens, calm, efficient */
-  --optimal-primary: #2DD4BF;
+  /* Bandwidth State Tokens (refined palette) */
+  /* Optimal - Deep teal to soft mint, calm and focused */
+  --optimal-primary: #0D9488;
   --optimal-secondary: #14B8A6;
-  --optimal-tertiary: #0D9488;
+  --optimal-tertiary: #99F6E4;
   --optimal-background: #F0FDFA;
-  --optimal-shadow: 0 4px 12px rgba(45, 212, 191, 0.15);
+  --optimal-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
   --optimal-weight: 400;
   --optimal-curve: cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Moderate State - Warm yellows, alert but stable */
-  --moderate-primary: #FBBF24;
-  --moderate-secondary: #F59E0B;
-  --moderate-tertiary: #D97706;
+  /* Moderate - Warm amber to honey, alert but stable */
+  --moderate-primary: #F59E0B;
+  --moderate-secondary: #FBBF24;
+  --moderate-tertiary: #FDE68A;
   --moderate-background: #FFFBEB;
-  --moderate-shadow: 0 6px 16px rgba(251, 191, 36, 0.2);
+  --moderate-shadow: 0 6px 16px rgba(245, 158, 11, 0.2);
   --moderate-weight: 450;
   --moderate-curve: cubic-bezier(0.45, 0, 0.15, 1);
 
-  /* Strained State - Deep oranges, tension building */
-  --strained-primary: #FB923C;
-  --strained-secondary: #F97316;
-  --strained-tertiary: #EA580C;
+  /* Strained - Coral to peach, tension building */
+  --strained-primary: #F97316;
+  --strained-secondary: #FB923C;
+  --strained-tertiary: #FDBA74;
   --strained-background: #FFF7ED;
   --strained-shadow: 0 8px 20px rgba(249, 115, 22, 0.25);
   --strained-weight: 500;
   --strained-curve: cubic-bezier(0.5, 0, 0.1, 1);
 
-  /* Critical State - Urgent reds, requires intervention */
-  --critical-primary: #EF4444;
-  --critical-secondary: #DC2626;
-  --critical-tertiary: #B91C1C;
-  --critical-background: #FEF2F2;
-  --critical-shadow: 0 10px 24px rgba(239, 68, 68, 0.3);
+  /* Critical - Rose palette, urgent but supportive */
+  --critical-primary: #E11D48;
+  --critical-secondary: #EF4444;
+  --critical-tertiary: #FDA4AF;
+  --critical-background: #FFF1F2;
+  --critical-shadow: 0 10px 24px rgba(225, 29, 72, 0.25);
   --critical-weight: 550;
   --critical-curve: cubic-bezier(0.55, 0, 0.05, 1);
 
@@ -266,9 +269,23 @@
 }
 
 .gradient-mesh {
-  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(45, 212, 191, 0.15), transparent),
-              radial-gradient(ellipse 60% 40% at 100% 50%, rgba(251, 191, 36, 0.08), transparent),
-              radial-gradient(ellipse 50% 30% at 0% 80%, rgba(45, 212, 191, 0.1), transparent);
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(13, 148, 136, 0.12), transparent),
+              radial-gradient(ellipse 60% 40% at 100% 50%, rgba(245, 158, 11, 0.06), transparent),
+              radial-gradient(ellipse 50% 30% at 0% 80%, rgba(13, 148, 136, 0.08), transparent);
+}
+
+/* Bento card styles */
+.bento-card {
+  border-radius: var(--radius-bento);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+.bento-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .card-glow {
