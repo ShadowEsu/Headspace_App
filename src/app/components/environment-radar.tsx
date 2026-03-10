@@ -1,9 +1,25 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, Radio, Volume2, Sun, Wind, Users, MapPin, Shield } from "lucide-react";
+import {
+  ArrowLeft,
+  Radio,
+  Volume2,
+  Sun,
+  Wind,
+  Users,
+  MapPin,
+  Shield,
+  Cloud,
+  Droplets,
+  Flower2,
+  Newspaper,
+  RefreshCw,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { cn } from "./ui/utils";
+import { useEnvironmentContext } from "../hooks/useEnvironmentContext";
+import type { AirQualityData } from "../services/env-apis";
 
 type StressLevel = "low" | "moderate" | "high" | "critical";
 
@@ -14,18 +30,6 @@ interface EnvFactor {
   level: StressLevel;
   icon: typeof Volume2;
 }
-
-const MOCK_CURRENT = {
-  name: "Current space",
-  overall: 42,
-  level: "moderate" as StressLevel,
-  factors: [
-    { id: "noise", label: "Noise", value: 55, level: "moderate" as StressLevel, icon: Volume2 },
-    { id: "light", label: "Light", value: 30, level: "low" as StressLevel, icon: Sun },
-    { id: "air", label: "Air quality", value: 25, level: "low" as StressLevel, icon: Wind },
-    { id: "crowding", label: "Crowding", value: 68, level: "high" as StressLevel, icon: Users },
-  ] as EnvFactor[],
-};
 
 const MOCK_SPACES = [
   { name: "Quiet room 3F", stress: 18, level: "low" as StressLevel, distance: "2 min" },
@@ -55,18 +59,67 @@ const LEVEL_LABELS: Record<StressLevel, string> = {
   critical: "Critical",
 };
 
+function aqiToStressLevel(aqi: AirQualityData["level"]): StressLevel {
+  switch (aqi) {
+    case "good":
+      return "low";
+    case "moderate":
+      return "moderate";
+    case "unhealthy":
+      return "high";
+    default:
+      return "critical";
+  }
+}
+
 export function EnvironmentRadar() {
   const navigate = useNavigate();
   const [sensingEnabled, setSensingEnabled] = useState(true);
   const [sweepAngle, setSweepAngle] = useState(0);
+  const { data, loading, error, refetch } = useEnvironmentContext();
 
   useEffect(() => {
     const t = setInterval(() => setSweepAngle((a) => (a + 2) % 360), 50);
     return () => clearInterval(t);
   }, []);
 
+  // Build factors from real API data + mock noise/crowding
+  const factors: EnvFactor[] = data
+    ? [
+        { id: "noise", label: "Noise", value: 55, level: "moderate" as StressLevel, icon: Volume2 },
+        {
+          id: "air",
+          label: "Air quality",
+          value: Math.min(100, 100 - data.airQuality.usAqi),
+          level: aqiToStressLevel(data.airQuality.level),
+          icon: Wind,
+        },
+        {
+          id: "uv",
+          label: "UV index",
+          value: Math.min(100, 100 - data.weather.uvIndex * 12),
+          level: data.weather.uvIndex >= 8 ? "high" : data.weather.uvIndex >= 5 ? "moderate" : "low",
+          icon: Sun,
+        },
+        {
+          id: "weather",
+          label: "Humidity",
+          value: 100 - data.weather.humidity,
+          level: data.weather.humidity >= 80 ? "high" : data.weather.humidity >= 60 ? "moderate" : "low",
+          icon: Cloud,
+        },
+        { id: "crowding", label: "Crowding", value: 68, level: "high" as StressLevel, icon: Users },
+      ]
+    : [];
+
+  const overall = factors.length
+    ? Math.round(factors.reduce((s, f) => s + f.value, 0) / factors.length)
+    : 42;
+  const overallLevel: StressLevel =
+    overall <= 30 ? "low" : overall <= 55 ? "moderate" : overall <= 75 ? "high" : "critical";
+
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col gradient-mesh bg-[#f8fcfb]">
+    <div className="relative min-h-screen w-full overflow-x-hidden flex flex-col gradient-mesh noise-overlay">
       <header className="flex-shrink-0 flex items-center justify-between px-4 py-3 glass-panel border-b border-white/60">
         <button
           onClick={() => navigate("/home")}
@@ -77,21 +130,70 @@ export function EnvironmentRadar() {
         </button>
         <div className="flex items-center gap-2">
           <span className="text-[9px] font-bold uppercase tracking-widest text-gray-400 bg-gray-100/80 px-2.5 py-1 rounded-full border border-gray-200/60">
-            Add-on
+            Live APIs
           </span>
           <h1 className="text-sm font-bold uppercase tracking-widest text-gray-800">
-            Stress Radar
+            Environment Radar
           </h1>
         </div>
-        <div className="w-10" />
+        <button
+          onClick={() => refetch()}
+          disabled={loading}
+          className="p-2 rounded-full hover:bg-white/60 transition-colors"
+          aria-label="Refresh"
+        >
+          <RefreshCw className={cn("w-5 h-5 text-gray-600", loading && "animate-spin")} />
+        </button>
       </header>
 
       <div className="flex-1 overflow-y-auto px-4 py-5 space-y-6 pb-10">
         <p className="text-sm text-gray-600 font-medium leading-relaxed">
-          See invisible environmental load — noise, light, air, crowding — and find calmer spaces.
+          Live weather, air quality, UV, pollen & more — all fetched from the browser, no backend.
         </p>
 
-        {/* Radar viz: concentric circles + sweep */}
+        {error && (
+          <div className="rounded-2xl bg-rose-50 border border-rose-200 p-4 text-sm text-rose-700">
+            {error}
+          </div>
+        )}
+
+        {/* Weather + Air Quality quick cards */}
+        {data && (
+          <motion.section
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-2 gap-3"
+          >
+            <div className="bento-card p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Cloud className="w-4 h-4 text-teal-600" />
+                <span className="text-xs font-semibold text-stone-500 uppercase">Weather</span>
+              </div>
+              <p className="text-2xl font-number font-bold text-stone-900">
+                {Math.round(data.weather.temp)}°C
+              </p>
+              <p className="text-xs text-stone-600">{data.weather.condition}</p>
+              <p className="text-xs text-stone-400 mt-1">
+                Feels {Math.round(data.weather.feelsLike)}° · {data.weather.humidity}% humidity
+              </p>
+            </div>
+            <div className="bento-card p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Wind className="w-4 h-4 text-teal-600" />
+                <span className="text-xs font-semibold text-stone-500 uppercase">Air quality</span>
+              </div>
+              <p className="text-2xl font-number font-bold text-stone-900">
+                AQI {data.airQuality.usAqi}
+              </p>
+              <p className="text-xs text-stone-600 capitalize">{data.airQuality.level.replace("_", " ")}</p>
+              <p className="text-xs text-stone-400 mt-1">
+                PM2.5 {Math.round(data.airQuality.pm25)} · PM10 {Math.round(data.airQuality.pm10)}
+              </p>
+            </div>
+          </motion.section>
+        )}
+
+        {/* Radar viz */}
         <section className="rounded-3xl border border-white/80 bg-gradient-to-br from-gray-900 to-gray-800 shadow-2xl overflow-hidden card-glow">
           <div className="p-5 pb-6">
             <div className="flex items-center gap-2 mb-4">
@@ -99,13 +201,16 @@ export function EnvironmentRadar() {
                 <Radio className="w-4 h-4 text-[#2DD4BF]" />
               </div>
               <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-                Your current space
+                Environmental load
               </h2>
+              {data?.geo.city && (
+                <span className="text-[10px] text-gray-500 ml-auto">{data.geo.city}</span>
+              )}
             </div>
             <div className="flex items-center justify-between mb-5">
               <div>
                 <span className="text-4xl font-light text-white tracking-tight">
-                  {MOCK_CURRENT.overall}
+                  {loading ? "—" : overall}
                   <span className="text-xl text-gray-400">/100</span>
                 </span>
                 <p className="text-xs text-gray-400 mt-1">Lower = calmer</p>
@@ -113,30 +218,26 @@ export function EnvironmentRadar() {
               <span
                 className={cn(
                   "text-[10px] font-bold uppercase px-3 py-1.5 rounded-full text-white bg-gradient-to-r shadow-lg",
-                  LEVEL_GRADIENTS[MOCK_CURRENT.level]
+                  LEVEL_GRADIENTS[overallLevel]
                 )}
               >
-                {LEVEL_LABELS[MOCK_CURRENT.level]}
+                {LEVEL_LABELS[overallLevel]}
               </span>
             </div>
 
-            {/* Radar circles */}
             <div className="relative flex items-center justify-center aspect-square max-w-[280px] mx-auto">
               <div className="absolute inset-0 rounded-full border border-white/10" />
               <div className="absolute inset-[12%] rounded-full border border-white/10" />
               <div className="absolute inset-[24%] rounded-full border border-white/10" />
               <div className="absolute inset-[36%] rounded-full border border-white/10" />
               <div className="absolute inset-[48%] rounded-full border border-[#2DD4BF]/30" />
-              {/* Sweep line */}
               <motion.div
                 className="absolute left-1/2 top-1/2 w-1/2 h-0.5 origin-left bg-gradient-to-r from-transparent via-[#2DD4BF]/80 to-[#2DD4BF]"
                 style={{ rotate: sweepAngle }}
               />
-              {/* Center dot */}
               <div className="absolute w-3 h-3 rounded-full bg-[#2DD4BF] shadow-lg shadow-[#2DD4BF]/50" />
-              {/* Factor blips (mock positions by angle) */}
-              {MOCK_CURRENT.factors.map((f, i) => {
-                const angle = (i / 4) * 360 - 90;
+              {factors.map((f, i) => {
+                const angle = (i / factors.length) * 360 - 90;
                 const r = 35 + (f.value / 100) * 15;
                 const x = 50 + r * Math.cos((angle * Math.PI) / 180);
                 const y = 50 + r * Math.sin((angle * Math.PI) / 180);
@@ -161,39 +262,121 @@ export function EnvironmentRadar() {
         </section>
 
         {/* Factor bars */}
-        <section className="rounded-3xl border border-white/80 bg-white/70 shadow-lg shadow-teal-500/5 p-5 card-glow">
-          <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">
-            Breakdown
-          </h2>
-          <div className="space-y-4">
-            {MOCK_CURRENT.factors.map((f) => (
-              <div key={f.id} className="flex items-center gap-4">
-                <div
-                  className="p-2.5 rounded-xl shadow-sm flex-shrink-0"
-                  style={{ backgroundColor: `${LEVEL_COLORS[f.level]}20` }}
-                >
-                  <f.icon className="w-4 h-4" style={{ color: LEVEL_COLORS[f.level] }} />
+        {factors.length > 0 && (
+          <section className="rounded-3xl border border-white/80 bg-white/70 shadow-lg shadow-teal-500/5 p-5 card-glow">
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+              Breakdown
+            </h2>
+            <div className="space-y-4">
+              {factors.map((f) => (
+                <div key={f.id} className="flex items-center gap-4">
+                  <div
+                    className="p-2.5 rounded-xl shadow-sm flex-shrink-0"
+                    style={{ backgroundColor: `${LEVEL_COLORS[f.level]}20` }}
+                  >
+                    <f.icon className="w-4 h-4" style={{ color: LEVEL_COLORS[f.level] }} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between text-xs mb-1.5">
+                      <span className="font-medium text-gray-700">{f.label}</span>
+                      <span className="font-semibold tabular-nums" style={{ color: LEVEL_COLORS[f.level] }}>
+                        {f.value}
+                      </span>
+                    </div>
+                    <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                      <motion.div
+                        className={cn("h-full rounded-full bg-gradient-to-r", LEVEL_GRADIENTS[f.level])}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${f.value}%` }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <span className="font-medium text-gray-700">{f.label}</span>
-                    <span className="font-semibold tabular-nums" style={{ color: LEVEL_COLORS[f.level] }}>
-                      {f.value}
-                    </span>
-                  </div>
-                  <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                    <motion.div
-                      className={cn("h-full rounded-full bg-gradient-to-r", LEVEL_GRADIENTS[f.level])}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${f.value}%` }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                    />
-                  </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* UV + Sun + Pollen */}
+        {data && (
+          <motion.section
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-3xl border border-white/80 bg-white/70 shadow-lg p-5 card-glow"
+          >
+            <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">
+              Sun & pollen
+            </h2>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-100">
+                  <Sun className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-stone-800">UV index</p>
+                  <p className="text-lg font-number font-bold text-amber-600">{data.weather.uvIndex}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-teal-100">
+                  <Droplets className="w-5 h-5 text-teal-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-stone-800">Sun</p>
+                  <p className="text-xs text-stone-600">
+                    {data.sun.sunrise} – {data.sun.sunset}
+                  </p>
+                </div>
+              </div>
+              {data.pollen && (
+                <div className="col-span-2 flex items-center gap-3 p-3 rounded-xl bg-emerald-50">
+                  <Flower2 className="w-5 h-5 text-emerald-600" />
+                  <div>
+                    <p className="text-sm font-semibold text-stone-800">Pollen</p>
+                    <p className="text-xs text-stone-600">
+                      Grass {data.pollen.grass} · Tree {data.pollen.tree} · Weed {data.pollen.weed} —
+                      {data.pollen.level.replace("_", " ")}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.section>
+        )}
+
+        {/* News headlines */}
+        {data?.news && data.news.length > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="rounded-3xl border border-white/80 bg-white/70 shadow-lg p-5 card-glow"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Newspaper className="w-4 h-4 text-stone-500" />
+              <h2 className="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+                Headlines (stress context)
+              </h2>
+            </div>
+            <ul className="space-y-2">
+              {data.news.slice(0, 5).map((n, i) => (
+                <li key={i} className="text-sm">
+                  <a
+                    href={n.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stone-700 hover:text-teal-600 line-clamp-2"
+                  >
+                    {n.title}
+                  </a>
+                  <span className="text-xs text-stone-400">{n.source}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.section>
+        )}
 
         {/* Nearby spaces */}
         <section className="rounded-3xl border border-white/80 bg-white/70 shadow-lg shadow-teal-500/5 p-5 card-glow">
@@ -206,7 +389,7 @@ export function EnvironmentRadar() {
             </h2>
           </div>
           <p className="text-xs text-gray-500 mb-4 font-medium">
-            Lower stress = better for focus and bandwidth.
+            Lower stress = better for focus and bandwidth. (Mock data)
           </p>
           <ul className="space-y-2">
             {MOCK_SPACES.map((space, i) => (
@@ -253,10 +436,10 @@ export function EnvironmentRadar() {
             <Shield className="w-5 h-5 text-gray-600" />
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 mb-1">Add-on safeguards</p>
+            <p className="text-sm font-semibold text-gray-800 mb-1">Frontend-only, no backend</p>
             <p className="text-xs text-gray-600 leading-relaxed">
-              Sensing is opt-in. No continuous recording; only on-demand or when you open this
-              screen. Data stays on your device. You can disable the add-on in Safeguards.
+              All APIs are called directly from your browser. No server, no stored data. Add
+              VITE_OPENWEATHER_API_KEY and VITE_NEWS_API_KEY in .env for optional extras.
             </p>
             <Button
               variant={sensingEnabled ? "default" : "outline"}

@@ -26,8 +26,10 @@ import {
   Calendar,
   Brain,
   Users,
+  Radio,
 } from "lucide-react";
 import { cn } from "./ui/utils";
+import { useEnvironmentContext } from "../hooks/useEnvironmentContext";
 
 const MOCK_STATS = {
   sessionsThisWeek: 12,
@@ -115,6 +117,7 @@ export function Home() {
   const [showEmergency, setShowEmergency] = useState(false);
   const [assistantMessage, setAssistantMessage] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: envContext } = useEnvironmentContext();
 
   const handleAssistantChoice = (key: string) => {
     setAssistantMessage(ASSISTANT_RESPONSES[key] ?? ASSISTANT_RESPONSES.other);
@@ -168,6 +171,7 @@ export function Home() {
               { label: "Interventions", icon: Wind, path: "/interventions" },
               { label: "Weekly Report", icon: FileText, path: "/weekly-report" },
               { label: "Group Mode", icon: Users, path: "/group" },
+              { label: "Environment Radar", icon: Radio, path: "/environment-radar" },
               { label: "About this sense", icon: Brain, path: "/sense" },
               { label: "Safeguards", icon: Shield, path: "/safeguards" },
             ].map(({ label, icon: Icon, path }) => (
@@ -299,6 +303,33 @@ export function Home() {
               <p className="text-xs text-stone-500">
                 Best deep work: 9:30–11:00 · Suggested break: 3:00 PM
               </p>
+            </motion.div>
+
+            {/* Environment Context - live APIs */}
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.08 }}
+              className="rounded-2xl bento-card p-4 mb-6 flex items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => navigate("/environment-radar")}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2.5 rounded-xl bg-teal-100">
+                  <Radio className="w-4 h-4 text-teal-600" />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-semibold text-stone-900 text-sm">Environment Radar</h3>
+                  <p className="text-xs text-stone-500 truncate">
+                    {envContext ? (
+                      <>{(envContext.geo.city && `${envContext.geo.city} · `)}
+                        {Math.round(envContext.weather.temp)}° · AQI {envContext.airQuality.usAqi}</>
+                    ) : (
+                      "Live weather, air quality, UV, pollen…"
+                    )}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-stone-400 flex-shrink-0" />
             </motion.div>
 
             <div className="flex items-center justify-between mb-4">

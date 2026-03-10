@@ -1,6 +1,8 @@
-# Cognitive Bandwidth Monitor App
+# Headspace
 
-A mobile-first app that visualizes cognitive load state and provides interventions. Built with React, Vite, and Tailwind CSS.
+**See your mental load. Act before burnout.**
+
+A mobile-first cognitive bandwidth monitor that visualizes mental load in real time — like a heart rate monitor for your mind — and suggests interventions before you hit overload.
 
 ## Quick start
 
@@ -9,60 +11,95 @@ npm i
 npm run dev
 ```
 
-Then open **http://localhost:5501** — visit `/` (Onboarding) or `/home` (dashboard).
+Open **http://localhost:5500/Headspace_App/** — visit `/` (Onboarding) or `/home` (dashboard).
 
 ## Routes
 
 | Path | Purpose |
 |------|---------|
-| `/` | Onboarding flow |
+| `/` | Onboarding & cognitive archetype |
 | `/home` | Main dashboard with bandwidth orb |
 | `/live-session` | Real-time session tracking |
-| `/weekly-report` | Historical bandwidth charts |
-| `/interventions` | Cognitive intervention library |
-| `/safeguards` | Settings and limits |
-| `/hospitals` | Nearby hospital search (Google Maps) |
+| `/weekly-report` | Historical charts & patterns |
+| `/interventions` | Intervention library |
+| `/group` | Team/classroom mode |
+| `/environment-radar` | Live weather, air quality, UV, pollen |
+| `/sense` | About cognitive bandwidth |
+| `/safeguards` | Settings, privacy, emergency |
+| `/hospitals` | Nearby hospital search |
 | `/widget` | Compact wearable display |
+
+## Environment APIs (frontend-only, no backend)
+
+The **Environment Radar** (`/environment-radar`) fetches live data directly from your browser:
+
+| API | Data | Key required |
+|-----|------|--------------|
+| ipapi.co | Location | No |
+| Open-Meteo | Weather, UV, sun | No |
+| Open-Meteo Air Quality | PM2.5, PM10, AQI | No |
+| Open-Meteo Pollen | Grass, tree, weed | No |
+| OpenWeatherMap | Weather (optional) | Yes |
+| NewsAPI | Headlines (optional) | Yes |
+
+Add optional keys to `.env`:
+
+```bash
+VITE_OPENWEATHER_API_KEY=   # Enhanced weather
+VITE_NEWS_API_KEY=          # News headlines for stress context
+```
 
 ## Hospital search (Google Maps)
 
-The `/hospitals` page uses the Google Maps Places API to find nearby hospitals. To enable it:
+The `/hospitals` page uses Google Maps Places API:
 
 1. Copy `.env.example` to `.env`
 2. Get an API key from [Google Cloud Console](https://console.cloud.google.com/google/maps-apis/)
 3. Enable **Maps JavaScript API** and **Places API**
 4. Add `VITE_GOOGLE_MAPS_API_KEY=your_key` to `.env`
 
-## Deploy (make it live)
+## Deploy
 
-### Option A: Vercel (recommended)
+### GitHub Pages
 
-1. Push your code to GitHub
-2. Go to [vercel.com](https://vercel.com) → **Add New Project** → Import your repo
-3. Root directory: `.` — Build command: `npm run build` — Output: `dist`
-4. Add env var `VITE_GOOGLE_MAPS_API_KEY` if using hospital search
-5. Deploy
+The app is configured for **https://username.github.io/Headspace_App/**:
 
-Or via CLI (after `npx vercel login`):
+1. Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**
+2. Push to `main` — the workflow builds and deploys automatically
+
+Or deploy manually:
 
 ```bash
 npm run build
-npx vercel --prod
+npm run deploy:gh
 ```
 
-### Option B: Netlify
+### Vercel
 
-1. Push to GitHub
-2. Go to [netlify.com](https://netlify.com) → **Add new site** → Import from Git
-3. Build command: `npm run build` — Publish directory: `dist`
+1. Import repo at [vercel.com](https://vercel.com)
+2. Build: `npm run build` — Output: `dist`
+3. Add env vars for Google Maps, OpenWeather, NewsAPI
 4. Deploy
 
-### Preview production build locally
+### Netlify
+
+1. Import from Git at [netlify.com](https://netlify.com)
+2. Build: `npm run build` — Publish: `dist`
+3. Deploy
+
+### Preview locally
 
 ```bash
 npm run build
 npm run preview
 ```
 
-Opens at **http://localhost:4173**
-  
+Opens at **http://localhost:4173/Headspace_App/**
+
+## Stack
+
+React 18 · TypeScript · Vite · Tailwind CSS v4 · Motion · shadcn/ui · Recharts
+
+## License
+
+MIT
