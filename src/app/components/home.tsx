@@ -127,7 +127,7 @@ export function Home() {
   const WeatherIcon = weather.icon;
 
   return (
-    <div className="min-h-screen w-full flex gradient-mesh noise-overlay">
+    <div className="h-screen min-h-screen w-full flex flex-col overflow-hidden gradient-mesh noise-overlay">
       {/* Left Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-stone-200 flex-shrink-0">
         <div className="p-4 border-b border-stone-100">
@@ -251,10 +251,12 @@ export function Home() {
           </Button>
         </div>
 
-        {/* Two-column main area */}
-        <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
-          {/* Left column: Recent / Following */}
-          <div className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 border-r border-stone-100">
+        {/* Two-column main area - single scroll on mobile, split scroll on desktop */}
+        <main className="flex-1 flex min-h-0 overflow-hidden">
+          {/* Mobile: single scrollable column; Desktop: two columns with own scroll */}
+          <div className="flex-1 min-w-0 min-h-0 overflow-y-auto lg:overflow-hidden overscroll-contain touch-pan-y flex flex-col lg:flex-row [&::-webkit-scrollbar]:w-0">
+            {/* Left column: Recent / Following */}
+            <div className="flex-shrink-0 lg:flex-1 min-w-0 p-4 lg:p-6 lg:min-h-0 lg:overflow-y-auto lg:overflow-x-hidden lg:border-r border-stone-100">
             {/* Cognitive Weather banner */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -427,7 +429,7 @@ export function Home() {
           </div>
 
           {/* Right column: Trending / Quick actions */}
-          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 overflow-y-auto p-4 lg:p-6 bg-stone-50/40">
+          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 p-4 lg:p-6 lg:min-h-0 lg:overflow-y-auto bg-stone-50/40">
             <h2 className="text-base font-semibold text-stone-900 mb-2">
               Trending last 7 days
             </h2>
@@ -591,6 +593,7 @@ export function Home() {
                 )}
               </AnimatePresence>
             </div>
+          </div>
           </div>
         </main>
       </div>

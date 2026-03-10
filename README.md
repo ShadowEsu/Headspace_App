@@ -4,7 +4,12 @@
 
 A mobile-first cognitive bandwidth monitor that visualizes mental load in real time — like a heart rate monitor for your mind — and suggests interventions before you hit overload.
 
-## Quick start
+## Live app
+
+- **Production URL:** https://shadowesu.github.io/Headspace_App/
+- Optimized for mobile; best viewed on a phone-sized viewport.
+
+## Quick start (local)
 
 ```bash
 npm i
@@ -58,11 +63,18 @@ The `/hospitals` page uses Google Maps Places API:
 3. Enable **Maps JavaScript API** and **Places API**
 4. Add `VITE_GOOGLE_MAPS_API_KEY=your_key` to `.env`
 
+## Figma design
+
+The original UI was designed in Figma (Headspace cognitive bandwidth dashboard with bento-style cards, breathing orb, and mobile-first layout).  
+You can link your file here, for example:
+
+- Figma prototype: _add your Figma link here_
+
 ## Deploy
 
 ### GitHub Pages
 
-The app is configured for **https://username.github.io/Headspace_App/**:
+The app is configured and live at **https://shadowesu.github.io/Headspace_App/**:
 
 1. Enable GitHub Pages: **Settings → Pages → Source: GitHub Actions**
 2. Push to `main` — the workflow builds and deploys automatically
