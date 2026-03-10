@@ -20,6 +20,12 @@ import {
   X,
   RefreshCw,
   MapPin,
+  Cloud,
+  CloudRain,
+  Sun,
+  Calendar,
+  Brain,
+  Users,
 } from "lucide-react";
 import { cn } from "./ui/utils";
 
@@ -82,6 +88,27 @@ const ASSISTANT_RESPONSES: Record<string, string> = {
 const CATEGORY_TABS = ["All", "Sessions", "Tips", "Interventions"] as const;
 type Tab = (typeof CATEGORY_TABS)[number];
 
+// Cognitive Weather: Clear (<50 avg, <1 critical spike), Cloudy (50-70), Stormy (>70 or 2+ critical)
+function getCognitiveWeather(stats: { avgBandwidth: number }, history: { peakLoad: number }[]) {
+  const criticalCount = history.filter((h) => h.peakLoad >= 80).length;
+  if (stats.avgBandwidth < 50 && criticalCount < 1)
+    return { label: "Clear", icon: Sun, color: "text-teal-600", bg: "bg-teal-50", copy: "Plenty of mental space. Good time for deep work." };
+  if (stats.avgBandwidth < 70 && criticalCount < 2)
+    return { label: "Cloudy", icon: Cloud, color: "text-amber-600", bg: "bg-amber-50", copy: "Moderate load. Pace yourself and take short breaks." };
+  return { label: "Stormy", icon: CloudRain, color: "text-rose-600", bg: "bg-rose-50", copy: "Elevated load. Stick to small tasks, delay big decisions." };
+}
+
+// Smart Day Planner: mock schedule with focus blocks and breaks
+const MOCK_DAY_SCHEDULE = [
+  { start: 9, end: 11, type: "focus", label: "Deep work" },
+  { start: 11, end: 11.25, type: "break", label: "5 min reset" },
+  { start: 11.25, end: 12.5, type: "focus", label: "Focused work" },
+  { start: 12.5, end: 13.5, type: "lunch", label: "Lunch" },
+  { start: 13.5, end: 15, type: "meetings", label: "Meetings" },
+  { start: 15, end: 15.08, type: "break", label: "5 min reset" },
+  { start: 15.08, end: 17, type: "light", label: "Light tasks" },
+];
+
 export function Home() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<Tab>("All");
@@ -93,6 +120,8 @@ export function Home() {
     setAssistantMessage(ASSISTANT_RESPONSES[key] ?? ASSISTANT_RESPONSES.other);
   };
 
+  const weather = getCognitiveWeather(MOCK_STATS, MOCK_HISTORY);
+  const WeatherIcon = weather.icon;
 
   return (
     <div className="min-h-screen w-full flex bg-white">
@@ -138,6 +167,8 @@ export function Home() {
             {[
               { label: "Interventions", icon: Wind, path: "/interventions" },
               { label: "Weekly Report", icon: FileText, path: "/weekly-report" },
+              { label: "Group Mode", icon: Users, path: "/group" },
+              { label: "About this sense", icon: Brain, path: "/sense" },
               { label: "Safeguards", icon: Shield, path: "/safeguards" },
             ].map(({ label, icon: Icon, path }) => (
               <button
@@ -168,9 +199,9 @@ export function Home() {
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">CB</span>
+                <span className="text-white font-bold text-lg">HS</span>
               </div>
-              <h1 className="text-lg font-semibold text-stone-900">Cognitive Bandwidth</h1>
+              <h1 className="text-lg font-semibold text-stone-900">Headspace</h1>
             </div>
             <div className="flex-1 max-w-md">
               <div className="relative">
@@ -220,6 +251,46 @@ export function Home() {
         <main className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
           {/* Left column: Recent / Following */}
           <div className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 border-r border-stone-100">
+            {/* Cognitive Weather banner */}
+            <div className={cn("rounded-xl p-4 mb-4 flex items-start gap-3", weather.bg)}>
+              <WeatherIcon className={cn("w-5 h-5 flex-shrink-0 mt-0.5", weather.color)} />
+              <div>
+                <p className={cn("text-sm font-semibold", weather.color)}>
+                  Cognitive Weather: {weather.label}
+                </p>
+                <p className="text-xs text-stone-600 mt-0.5">{weather.copy}</p>
+              </div>
+            </div>
+
+            {/* Smart Day Planner */}
+            <div className="rounded-xl border border-stone-200 bg-white p-4 mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <Calendar className="w-4 h-4 text-teal-600" />
+                <h3 className="font-semibold text-stone-900 text-sm">Today's plan</h3>
+              </div>
+              <div className="flex gap-1 mb-3 overflow-x-auto pb-1">
+                {MOCK_DAY_SCHEDULE.map((s) => (
+                  <div
+                    key={s.label}
+                    className={cn(
+                      "flex-shrink-0 h-8 rounded-lg flex items-center justify-center text-[10px] font-medium px-2",
+                      s.type === "focus" && "bg-teal-100 text-teal-700",
+                      s.type === "break" && "bg-amber-100 text-amber-700",
+                      s.type === "meetings" && "bg-rose-100 text-rose-700",
+                      s.type === "lunch" && "bg-stone-100 text-stone-600",
+                      s.type === "light" && "bg-stone-50 text-stone-500"
+                    )}
+                    title={`${s.start}-${s.end}: ${s.label}`}
+                  >
+                    {s.label}
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-stone-500">
+                Best deep work: 9:30–11:00 · Suggested break: 3:00 PM
+              </p>
+            </div>
+
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-stone-900 flex items-center gap-1">
                 Recent activity

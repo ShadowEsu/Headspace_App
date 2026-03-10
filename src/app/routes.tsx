@@ -9,6 +9,7 @@ import { Safeguards } from "./components/safeguards";
 import { WearableWidget } from "./components/wearable-widget";
 import { EnvironmentRadar } from "./components/environment-radar";
 import { HospitalSearch } from "./components/hospital-search";
+import { SenseAbout } from "./components/sense-about";
 
 export const router = createBrowserRouter([
   {
@@ -50,5 +51,9 @@ export const router = createBrowserRouter([
   {
     path: "/hospitals",
     Component: HospitalSearch,
+  },
+  {
+    path: "/sense",
+    Component: SenseAbout,
   },
 ]);

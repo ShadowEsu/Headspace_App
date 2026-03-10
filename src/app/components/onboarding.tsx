@@ -76,7 +76,7 @@ export function Onboarding() {
                 className="text-center max-w-md w-full"
               >
                 <h1 className="text-2xl font-bold text-stone-900 mb-3">
-                  Welcome to Cognitive Bandwidth
+                  Welcome to Headspace
                 </h1>
                 <p className="text-stone-600 mb-8 leading-relaxed">
                   We'll establish your cognitive baseline through a brief calibration. This takes
@@ -214,6 +214,13 @@ export function Onboarding() {
                 >
                   Continue to dashboard
                 </Button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/sense")}
+                  className="w-full mt-3 text-sm text-stone-500 hover:text-[#0D9488]"
+                >
+                  Learn how we estimate your bandwidth →
+                </button>
               </motion.div>
             )}
           </AnimatePresence>

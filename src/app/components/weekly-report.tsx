@@ -21,8 +21,16 @@ const MOCK_WEEKLY_DATA = [
   { day: "Sun", avg: 45, peak: 62 },
 ];
 
+// Patterns derived from mock data
+function getPatterns(data: typeof MOCK_WEEKLY_DATA) {
+  const peakDay = data.reduce((a, b) => (b.peak > a.peak ? b : a), data[0]);
+  const lowDay = data.reduce((a, b) => (b.avg < a.avg ? b : a), data[0]);
+  return { peakDay, lowDay };
+}
+
 export function WeeklyReport() {
   const navigate = useNavigate();
+  const patterns = getPatterns(MOCK_WEEKLY_DATA);
 
   const stats = {
     avgBandwidth: 58,
@@ -132,6 +140,27 @@ export function WeeklyReport() {
                 </AreaChart>
               </ResponsiveContainer>
             </div>
+          </div>
+
+          {/* Patterns / Trigger insights */}
+          <div className="bento-card p-5 mb-6">
+            <p className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+              Patterns & insights
+            </p>
+            <ul className="space-y-2 text-sm text-stone-700">
+              <li>
+                <span className="font-medium">Most overloaded day:</span>{" "}
+                {patterns.peakDay.day} ({patterns.peakDay.peak}% peak)
+              </li>
+              <li>
+                <span className="font-medium">Best recovery window:</span>{" "}
+                {patterns.lowDay.day} morning (avg {patterns.lowDay.avg}%)
+              </li>
+              <li>
+                <span className="font-medium">What this means:</span> Mid-week and Friday tend to
+                spike. Plan lighter tasks for Wed PM and protect Sat for recovery.
+              </li>
+            </ul>
           </div>
 
           {/* Stats grid */}
