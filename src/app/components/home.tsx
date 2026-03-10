@@ -127,7 +127,7 @@ export function Home() {
   const WeatherIcon = weather.icon;
 
   return (
-    <div className="h-screen min-h-screen w-full flex flex-col overflow-hidden gradient-mesh noise-overlay">
+    <div className="min-h-screen w-full flex flex-col gradient-mesh noise-overlay">
       {/* Left Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-stone-200 flex-shrink-0">
         <div className="p-4 border-b border-stone-100">
@@ -251,11 +251,10 @@ export function Home() {
           </Button>
         </div>
 
-        {/* Two-column main area - single scroll for both mobile and desktop (reliable on Windows) */}
-        <main className="flex-1 flex min-h-0 overflow-hidden">
-          <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y flex flex-col lg:flex-row">
-            {/* Left column */}
-            <div className="flex-shrink-0 lg:flex-1 min-w-0 p-4 lg:p-6 lg:border-r border-stone-100">
+        {/* Main content - document scroll (reliable everywhere) */}
+        <main className="flex-1 flex flex-col lg:flex-row min-h-0">
+          {/* Left column */}
+          <div className="flex-shrink-0 lg:flex-1 min-w-0 p-4 lg:p-6 lg:border-r border-stone-100">
             {/* Cognitive Weather banner */}
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -592,7 +591,6 @@ export function Home() {
                 )}
               </AnimatePresence>
             </div>
-          </div>
           </div>
         </main>
       </div>
