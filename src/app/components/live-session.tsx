@@ -56,7 +56,7 @@ export function LiveSession() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAFAF9] overflow-hidden">
+    <div className="relative min-h-screen w-full gradient-mesh noise-overlay overflow-hidden">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-4 glass-panel border-b border-black/5">
         <motion.button
@@ -77,7 +77,7 @@ export function LiveSession() {
         {/* Left: Timer & controls */}
         <div className="w-full md:w-1/2 flex flex-col items-center justify-center px-6 py-12 md:py-0 bg-white/60 md:border-r border-stone-200/80">
           <div className="text-center">
-            <div className="text-5xl font-bold text-stone-900 tracking-tight mb-2">
+            <div className="text-5xl font-number font-bold text-stone-900 tracking-tight mb-2">
               {formatTime(seconds)}
             </div>
             <p className="text-sm text-stone-500 mb-8">Session duration</p>
@@ -110,7 +110,7 @@ export function LiveSession() {
                 Current load
               </p>
               <p
-                className={`text-4xl font-bold ${
+                className={`text-4xl font-number font-bold ${
                   state === "optimal"
                     ? "text-[#0D9488]"
                     : state === "moderate"

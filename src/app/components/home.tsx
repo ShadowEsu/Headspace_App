@@ -124,7 +124,7 @@ export function Home() {
   const WeatherIcon = weather.icon;
 
   return (
-    <div className="min-h-screen w-full flex bg-white">
+    <div className="min-h-screen w-full flex gradient-mesh noise-overlay">
       {/* Left Sidebar */}
       <aside className="hidden lg:flex flex-col w-64 border-r border-stone-200 flex-shrink-0">
         <div className="p-4 border-b border-stone-100">
@@ -195,13 +195,13 @@ export function Home() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <header className="flex-shrink-0 border-b border-stone-200 px-4 lg:px-6 py-4">
+        <header className="flex-shrink-0 border-b border-stone-200/80 px-4 lg:px-6 py-4 glass-panel">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/20">
                 <span className="text-white font-bold text-lg">HS</span>
               </div>
-              <h1 className="text-lg font-semibold text-stone-900">Headspace</h1>
+              <h1 className="text-xl font-display font-semibold text-stone-900 tracking-tight">Headspace</h1>
             </div>
             <div className="flex-1 max-w-md">
               <div className="relative">
@@ -252,7 +252,12 @@ export function Home() {
           {/* Left column: Recent / Following */}
           <div className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6 border-r border-stone-100">
             {/* Cognitive Weather banner */}
-            <div className={cn("rounded-xl p-4 mb-4 flex items-start gap-3", weather.bg)}>
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className={cn("rounded-2xl p-4 mb-5 flex items-start gap-3 bento-card", weather.bg)}
+            >
               <WeatherIcon className={cn("w-5 h-5 flex-shrink-0 mt-0.5", weather.color)} />
               <div>
                 <p className={cn("text-sm font-semibold", weather.color)}>
@@ -260,10 +265,15 @@ export function Home() {
                 </p>
                 <p className="text-xs text-stone-600 mt-0.5">{weather.copy}</p>
               </div>
-            </div>
+            </motion.div>
 
             {/* Smart Day Planner */}
-            <div className="rounded-xl border border-stone-200 bg-white p-4 mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 }}
+              className="rounded-2xl bento-card bento-card-accent p-5 mb-6"
+            >
               <div className="flex items-center gap-2 mb-3">
                 <Calendar className="w-4 h-4 text-teal-600" />
                 <h3 className="font-semibold text-stone-900 text-sm">Today's plan</h3>
@@ -289,7 +299,7 @@ export function Home() {
               <p className="text-xs text-stone-500">
                 Best deep work: 9:30–11:00 · Suggested break: 3:00 PM
               </p>
-            </div>
+            </motion.div>
 
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold text-stone-900 flex items-center gap-1">
@@ -317,7 +327,12 @@ export function Home() {
             </div>
 
             {/* Featured card: Start session / Cognitive state */}
-            <div className="rounded-2xl border border-stone-200 bg-stone-50/50 p-5 mb-6 relative overflow-hidden">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="rounded-2xl bento-card card-glow p-5 mb-6 relative overflow-hidden"
+            >
               <span className="absolute top-4 right-4 px-2 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-bold rounded uppercase">
                 New
               </span>
@@ -347,20 +362,23 @@ export function Home() {
                   <Field bandwidth={25} state="optimal" className="absolute inset-0" />
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Session cards */}
-            <div className="space-y-3">
-              {MOCK_HISTORY.map((entry) => (
-                <div
+            <div className="space-y-4">
+              {MOCK_HISTORY.map((entry, i) => (
+                <motion.div
                   key={entry.id}
-                  className="rounded-xl border border-stone-200 p-4 hover:border-stone-300 hover:shadow-sm transition-all"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: 0.15 + i * 0.05 }}
+                  className="rounded-2xl bento-card p-4"
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-stone-900">{entry.date}</p>
                       <p className="text-xs text-stone-500">
-                        {entry.duration} · peak load {entry.peakLoad}%
+                        {entry.duration} · peak load <span className="font-number">{entry.peakLoad}%</span>
                       </p>
                     </div>
                     <Button
@@ -372,13 +390,13 @@ export function Home() {
                       View
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
           {/* Right column: Trending / Quick actions */}
-          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 overflow-y-auto p-4 lg:p-6 bg-stone-50/30">
+          <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 overflow-y-auto p-4 lg:p-6 bg-stone-50/40">
             <h2 className="text-base font-semibold text-stone-900 mb-2">
               Trending last 7 days
             </h2>
@@ -396,17 +414,20 @@ export function Home() {
               ))}
             </div>
 
-            <div className="space-y-3">
-              {QUICK_ACTIONS.map((item) => {
+            <div className="space-y-4">
+              {QUICK_ACTIONS.map((item, i) => {
                 const Icon = item.icon;
                 return (
-                  <div
+                  <motion.div
                     key={item.id}
+                    initial={{ opacity: 0, x: 8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.35, delay: 0.2 + i * 0.05 }}
                     className={cn(
-                      "rounded-xl border p-4 transition-all",
+                      "rounded-2xl bento-card p-4",
                       item.highlight
-                        ? "border-teal-200 bg-gradient-to-br from-teal-50/80 to-white"
-                        : "border-stone-200 bg-white hover:border-stone-300"
+                        ? "bento-card-accent border-teal-200/60 bg-gradient-to-br from-teal-50/80 to-white"
+                        : ""
                     )}
                   >
                     <div className="flex items-start justify-between gap-3 mb-2">
@@ -444,13 +465,18 @@ export function Home() {
                         Try
                       </Button>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
 
             {/* How are you / AI assistant */}
-            <div className="mt-6 rounded-xl border border-stone-200 bg-white p-4">
+            <motion.div
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, delay: 0.3 }}
+              className="mt-6 rounded-2xl bento-card p-4"
+            >
               <div className="flex items-center gap-2 mb-3">
                 <MessageCircle className="w-4 h-4 text-teal-600" />
                 <h3 className="font-medium text-stone-900 text-sm">How are you?</h3>
@@ -479,13 +505,16 @@ export function Home() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
 
             {/* Emergency */}
             <div className="mt-6">
-              <button
+              <motion.button
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.35 }}
                 onClick={() => setShowEmergency(!showEmergency)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-stone-200 bg-white hover:bg-stone-50"
+                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bento-card"
               >
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-red-500" />
@@ -494,14 +523,14 @@ export function Home() {
                 <ChevronDown
                   className={cn("w-4 h-4 text-stone-400 transition-transform", showEmergency && "rotate-180")}
                 />
-              </button>
+              </motion.button>
               <AnimatePresence>
                 {showEmergency && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden mt-2 rounded-xl border border-stone-200 bg-white p-4 space-y-2"
+                    className="overflow-hidden mt-2 rounded-2xl bento-card p-4 space-y-2"
                   >
                     {EMERGENCY_DIALS.map((d) => (
                       <div

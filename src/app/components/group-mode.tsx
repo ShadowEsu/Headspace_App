@@ -125,7 +125,7 @@ export function GroupMode() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAFAF9] overflow-hidden">
+    <div className="relative min-h-screen w-full gradient-mesh noise-overlay overflow-hidden">
       <header className="sticky top-0 z-20 glass-panel border-b border-black/5">
         <div className="flex items-center justify-between px-4 py-4">
           <motion.button

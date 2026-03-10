@@ -82,6 +82,25 @@ export function Field({ bandwidth, state, className = "", isIrregular = false }:
           ease: "easeInOut",
         }}
       >
+        {/* Outer glow - pulses with load */}
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          style={{
+            width: "340px",
+            height: "340px",
+            borderRadius: "50%",
+            background: `radial-gradient(circle, ${colors.primary}30, ${colors.primary}10, transparent)`,
+            filter: "blur(50px)",
+          }}
+          animate={{
+            opacity: [0.35, 0.6, 0.35],
+          }}
+          transition={{
+            duration: breathDuration * 1.2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
         {/* Outer ellipse */}
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"

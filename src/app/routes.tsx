@@ -11,7 +11,8 @@ import { EnvironmentRadar } from "./components/environment-radar";
 import { HospitalSearch } from "./components/hospital-search";
 import { SenseAbout } from "./components/sense-about";
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
   {
     path: "/",
     Component: Onboarding,
@@ -56,4 +57,6 @@ export const router = createBrowserRouter([
     path: "/sense",
     Component: SenseAbout,
   },
-]);
+  ],
+  { basename: '/Headspace_App' }
+);

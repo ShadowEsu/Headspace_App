@@ -7,7 +7,8 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "deploy": "npm run build && vercel --prod"
+    "deploy": "npm run build && vercel --prod",
+    "deploy:gh": "npm run build && npx gh-pages -d dist -t true"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

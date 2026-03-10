@@ -76,7 +76,7 @@ export function WearableWidget() {
           className="w-full h-full"
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-2xl font-bold text-white drop-shadow-lg">
+          <span className="text-2xl font-number font-bold text-white drop-shadow-lg">
             {Math.round(bandwidth)}
             <span className="text-sm font-medium opacity-80">%</span>
           </span>

@@ -45,10 +45,10 @@ export function Onboarding() {
   ];
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden flex flex-col">
-      {/* Hero-style background: gradient (add hero image via /hero-onboarding.jpg per ASSETS_GUIDE) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0D9488]/10 via-[#FAFAF9] to-amber-50/30">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#FAFAF9]/90" />
+    <div className="relative min-h-screen w-full overflow-hidden flex flex-col noise-overlay">
+      {/* Hero-style background */}
+      <div className="absolute inset-0 gradient-mesh">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#F8F6F3]/95" />
       </div>
 
       <div className="relative flex-1 flex flex-col z-10">
@@ -75,7 +75,7 @@ export function Onboarding() {
                 transition={{ duration: 0.4, ease: "easeInOut" }}
                 className="text-center max-w-md w-full"
               >
-                <h1 className="text-2xl font-bold text-stone-900 mb-3">
+                <h1 className="text-2xl font-display font-bold text-stone-900 mb-3 tracking-tight">
                   Welcome to Headspace
                 </h1>
                 <p className="text-stone-600 mb-8 leading-relaxed">
