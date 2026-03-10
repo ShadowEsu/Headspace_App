@@ -9,7 +9,7 @@ npm i
 npm run dev
 ```
 
-Then open **http://localhost:5173** — visit `/` (Onboarding) or `/home` (dashboard).
+Then open **http://localhost:5501** — visit `/` (Onboarding) or `/home` (dashboard).
 
 ## Routes
 
